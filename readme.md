@@ -15,7 +15,7 @@ This is a full-stack To-Do List application built using Node.js, Express.js, Mon
 - React frontend integrated with backend APIs
 
 ## Deployed Links
-- Frontend: https://YOUR-NETLIFY-LINK
+- Frontend: https://tutedude-todo-om.netlify.app
 - Backend: https://task8-todo-backend.onrender.com
 
 ## How to Run Locally
