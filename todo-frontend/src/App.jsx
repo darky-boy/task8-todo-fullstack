@@ -6,10 +6,12 @@ const BASE_URL = "https://task8-todo-backend.onrender.com";
 export default function App() {
   const [todos, setTodos] = useState([]);
   const [title, setTitle] = useState("");
+  const [search, setSearch] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch all todos
   const fetchTodos = async () => {
     try {
       setLoading(true);
@@ -24,7 +26,6 @@ export default function App() {
     }
   };
 
-  // Add todo
   const addTodo = async () => {
     if (!title.trim()) return;
 
@@ -44,7 +45,6 @@ export default function App() {
     }
   };
 
-  // Toggle status
   const toggleTodo = async (id, completed) => {
     try {
       await fetch(`${BASE_URL}/api/tasks/${id}`, {
@@ -52,18 +52,42 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ completed: !completed })
       });
+
       fetchTodos();
     } catch (err) {
       setError(err.message);
     }
   };
 
-  // Delete todo
   const deleteTodo = async (id) => {
     try {
       await fetch(`${BASE_URL}/api/tasks/${id}`, {
         method: "DELETE"
       });
+
+      fetchTodos();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const startEdit = (todo) => {
+    setEditingId(todo._id);
+    setEditTitle(todo.title);
+  };
+
+  const saveEdit = async (id) => {
+    if (!editTitle.trim()) return;
+
+    try {
+      await fetch(`${BASE_URL}/api/tasks/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: editTitle })
+      });
+
+      setEditingId(null);
+      setEditTitle("");
       fetchTodos();
     } catch (err) {
       setError(err.message);
@@ -73,6 +97,10 @@ export default function App() {
   useEffect(() => {
     fetchTodos();
   }, []);
+
+  const filteredTodos = todos.filter((todo) =>
+    todo.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="page">
@@ -89,16 +117,40 @@ export default function App() {
           <button onClick={addTodo}>Add</button>
         </div>
 
+        <input
+          className="search"
+          type="text"
+          placeholder="Search tasks..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
         {loading && <p className="info">Loading...</p>}
         {error && <p className="error">{error}</p>}
 
         <ul className="todo-list">
-          {todos.map((todo) => (
+          {filteredTodos.map((todo) => (
             <li key={todo._id} className={todo.completed ? "done" : ""}>
-              <span onClick={() => toggleTodo(todo._id, todo.completed)}>
-                {todo.title}
-              </span>
-              <button onClick={() => deleteTodo(todo._id)}>✕</button>
+              {editingId === todo._id ? (
+                <>
+                  <input
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                  />
+                  <button onClick={() => saveEdit(todo._id)}>✔</button>
+                </>
+              ) : (
+                <>
+                  <span onClick={() => toggleTodo(todo._id, todo.completed)}>
+                    {todo.title}
+                  </span>
+
+                  <div className="actions">
+                    <button onClick={() => startEdit(todo)}>✏️</button>
+                    <button onClick={() => deleteTodo(todo._id)}>✕</button>
+                  </div>
+                </>
+              )}
             </li>
           ))}
         </ul>
