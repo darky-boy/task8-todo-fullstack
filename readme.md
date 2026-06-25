@@ -11,11 +11,13 @@ This is a full-stack To-Do List application built using Node.js, Express.js, Mon
 ## Features
 - Create, read, update, and delete tasks
 - Update task status
+- Edit tasks
+- Search tasks instantly on frontend
 - API-based backend
 - React frontend integrated with backend APIs
 
 ## Deployed Links
-- Frontend: https://tutedude-todo-om.netlify.app/
+- Frontend: https://tutedude-todo-om.netlify.app
 - Backend: https://task8-todo-backend.onrender.com
 
 ## How to Run Locally
